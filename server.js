@@ -201,5 +201,5 @@ GET /propiedades/
 POST /reservas: Crea una nueva reserva.
 GET /reservas: Obtiene todas las reservas.
 GET /usuarios/
-/reservas: Obtiene las reservas de un usuario específico.
+/reservas: Obtiene las reservas de un usuario específico
 */
