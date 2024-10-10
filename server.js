@@ -8,11 +8,11 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const API_BASE_URL = process.env.API_BASE_URL; // Your database API endpoint
+const API_BASE_URL = process.env.API_BASE_URL; // El punto de conexión de la API de base de datos
 
 app.use(bodyParser.json());
 
-// Function to fetch hotel data from your API
+// Función para obtener datos del hotel desde su API
 async function getHotelData() {
   try {
     const response = await axios.get(`${API_BASE_URL}/hotel`);
@@ -23,7 +23,7 @@ async function getHotelData() {
   }
 }
 
-// Function to update room availability
+// Función para actualizar la disponibilidad de habitaciones
 async function updateRoomAvailability(roomId, dates, isAvailable) {
   try {
     const response = await axios.put(`${API_BASE_URL}/room/${roomId}/availability`, {
@@ -37,12 +37,12 @@ async function updateRoomAvailability(roomId, dates, isAvailable) {
   }
 }
 
-// Function to sync with OTA
+// Función para sincronizar con OTA
 async function syncWithOTA() {
   try {
     const hotelData = await getHotelData();
     
-    // Prepare data for OTA
+    // Preparación de datos para OTA
     const otaData = {
       hotelId: hotelData.id,
       rooms: hotelData.rooms.map(room => ({
@@ -52,7 +52,7 @@ async function syncWithOTA() {
       }))
     };
 
-    // Send data to OTA API
+    // Enviar datos a la API OTA
     const response = await axios.post('https://ota-api-endpoint.com/update', otaData, {
       headers: {
         'Authorization': `Bearer ${process.env.OTA_API_KEY}`
@@ -65,7 +65,7 @@ async function syncWithOTA() {
   }
 }
 
-// Schedule OTA sync
+// Programar sincronización OTA
 cron.schedule('0 * * * *', () => {
   console.log('Running OTA sync');
   syncWithOTA();
@@ -121,7 +121,7 @@ app.get('/buscar', async (req, res) => {
       );
       const meetsType = !tipo || room.roomType === tipo;
       const meetsPrice = !maxPrecio || room.price <= maxPrecio;
-      // Assuming hotel has a rating property
+      // Suponiendo que el hotel tiene una propiedad de calificación
       const meetsRating = !minCalificacion || hotelData.rating >= minCalificacion;
 
       return isAvailable && meetsType && meetsPrice && meetsRating;
@@ -148,7 +148,7 @@ app.post('/reservas', async (req, res) => {
       return res.status(404).json({ error: 'Room type not found' });
     }
 
-    // Update availability
+    // Disponibilidad de actualizaciones
     const startDate = new Date(fechaInicio);
     const endDate = new Date(fechaFin);
     const datesToUpdate = [];
@@ -158,11 +158,11 @@ app.post('/reservas', async (req, res) => {
 
     await updateRoomAvailability(room.id, datesToUpdate, false);
 
-    // Create reservation (you might want to add an endpoint for this in your API)
+    // Crear reserva (es posible que desee agregar un punto de conexión para esto en su API)
     const reservationData = { usuarioId, propiedadId, fechaInicio, fechaFin, roomType };
     const reservationResponse = await axios.post(`${API_BASE_URL}/reservations`, reservationData);
 
-    // Trigger OTA sync
+    // Activar la sincronización OTA
     await syncWithOTA();
 
     res.status(201).json({ message: 'Tu reserva ha sido creada!', reservation: reservationResponse.data });
@@ -176,7 +176,7 @@ app.get('/reservas', async (req, res) => {
     const reservationsResponse = await axios.get(`${API_BASE_URL}/reservations`);
     res.status(200).json(reservationsResponse.data);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching reservations' });
+    res.status(500).json({ error: 'Error al obtener reservas' });
   }
 });
 
@@ -186,7 +186,7 @@ app.get('/usuarios/:usuarioId/reservas', async (req, res) => {
     const reservationsResponse = await axios.get(`${API_BASE_URL}/reservations?usuarioId=${usuarioId}`);
     res.status(200).json(reservationsResponse.data);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching user reservations' });
+    res.status(500).json({ error: 'Error al obtener reservas de usuario' });
   }
 });
 
