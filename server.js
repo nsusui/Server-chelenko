@@ -77,7 +77,7 @@ app.get('/api/hotel-data', async (req, res) => {
     const hotelData = await getHotelData();
     res.json(hotelData);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching hotel data' });
+    res.status(500).json({ error: 'Error al obtener datos del hotel ' });
   }
 });
 
@@ -137,7 +137,7 @@ app.post('/reservas', async (req, res) => {
   const { usuarioId, propiedadId, fechaInicio, fechaFin, roomType } = req.body;
 
   if (!usuarioId || !propiedadId || !fechaInicio || !fechaFin || !roomType) {
-    return res.status(400).json({ error: 'Missing required reservation data' });
+    return res.status(400).json({ error: 'Faltan datos de reserva obligatorios' });
   }
 
   try {
@@ -145,7 +145,7 @@ app.post('/reservas', async (req, res) => {
     const room = hotelData.rooms.find(r => r.roomType === roomType);
     
     if (!room) {
-      return res.status(404).json({ error: 'Room type not found' });
+      return res.status(404).json({ error: 'Tipo de habitación no encontrada' });
     }
 
     // Disponibilidad de actualizaciones
